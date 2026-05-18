@@ -152,7 +152,7 @@ alias vim='nvim'
 # Git
 alias log="git log --graph -30 --oneline"
 alias gs="git status"
-alias ciaclean='git branch --merged origin/master | grep -vE "^\s*(\*|main|develop|master)" | xargs -n 1 git branch -d'
+alias gitclean='git branch --merged origin/master | grep -vE "^\s*(\*|main|develop|master)" | xargs -n 1 git branch -d'
 alias diffd="git diff develop...HEAD | diffnav"
 alias diffm="git diff master...HEAD | diffnav"
 
