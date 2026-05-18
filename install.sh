@@ -72,27 +72,36 @@ done
 export ASSUME_YES DRY_RUN
 
 # ---- module enable flags ----------------------------------------------------
-declare -A ENABLED=( [zsh]=1 [tmux]=1 [nvim]=1 [git]=1 [starship]=1 )
+# bash 3.2 (macOS default) doesn't support `declare -A`, so we use a
+# space-separated string sentinel pattern instead.
+ALL_MODULES="zsh tmux nvim git starship"
+ENABLED_MODULES="$ALL_MODULES"
+
 if [[ -n "$ONLY" ]]; then
-  for k in "${!ENABLED[@]}"; do ENABLED[$k]=0; done
-  IFS=',' read -ra picked <<<"$ONLY"
+  ENABLED_MODULES=""
+  # Split $ONLY on commas (portable across bash 3.x)
+  IFS=',' read -r -a picked <<<"$ONLY"
   for m in "${picked[@]}"; do
     m="$(echo "$m" | tr '[:upper:]' '[:lower:]' | xargs)"
-    if [[ -v ENABLED[$m] ]]; then
-      ENABLED[$m]=1
-    else
-      die "unknown module: $m (valid: ${!ENABLED[*]})"
-    fi
+    case " $ALL_MODULES " in
+      *" $m "*) ENABLED_MODULES="$ENABLED_MODULES $m" ;;
+      *)        die "unknown module: $m (valid: $ALL_MODULES)" ;;
+    esac
   done
 fi
 
-is_enabled() { [[ "${ENABLED[$1]:-0}" == "1" ]]; }
+is_enabled() {
+  case " $ENABLED_MODULES " in
+    *" $1 "*) return 0 ;;
+    *)        return 1 ;;
+  esac
+}
 
 # ---- banner -----------------------------------------------------------------
 log_section "Dotfiles install"
 log_info "repo:     $DOTFILES_DIR"
 log_info "dry-run:  $DRY_RUN"
-log_info "modules:  $(for m in "${!ENABLED[@]}"; do is_enabled "$m" && printf '%s ' "$m"; done)"
+log_info "modules: $ENABLED_MODULES"
 
 # ---- detect OS --------------------------------------------------------------
 detect_os
