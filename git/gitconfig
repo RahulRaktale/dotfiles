@@ -1,0 +1,54 @@
+# ~/.gitconfig  (managed by dotfiles)
+[user]
+	name = Rahul Raktale
+	email = RahulRaktale@users.noreply.github.com
+	username = rahulraktale
+
+[core]
+	editor = nvim
+	excludesfile = ~/.gitignore_global
+	pager = less -FRX
+	autocrlf = input
+
+[init]
+	defaultBranch = main
+
+[pull]
+	rebase = false
+
+[push]
+	default = simple
+	autoSetupRemote = true
+	followTags = true
+
+[fetch]
+	prune = true
+
+[rerere]
+	enabled = true
+
+[diff]
+	colorMoved = default
+	algorithm = histogram
+
+[merge]
+	conflictstyle = zdiff3
+
+[color]
+	ui = auto
+
+[alias]
+	co = checkout
+	br = branch
+	ci = commit
+	st = status -sb
+	last = log -1 HEAD
+	unstage = reset HEAD --
+	lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
+	amend = commit --amend --no-edit
+	wip = !git add -A && git commit -m 'wip'
+	undo = reset --soft HEAD~1
+
+# Local-only overrides go in ~/.gitconfig.local (not tracked)
+[include]
+	path = ~/.gitconfig.local

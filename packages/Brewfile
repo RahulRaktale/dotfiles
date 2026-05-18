@@ -1,0 +1,45 @@
+# Brewfile - macOS package manifest
+# Install with: brew bundle --file=packages/Brewfile
+# https://docs.brew.sh/Manpage#bundle-subcommand
+
+# Taps
+# tap "homebrew/bundle"
+# tap "homebrew/services"
+
+# --- Core shell / multiplexer / editor ----
+brew "zsh"
+brew "tmux"
+brew "neovim"
+
+# --- Prompt ----
+brew "starship"
+
+# --- Zsh plugins ----
+brew "zsh-autosuggestions"
+brew "zsh-syntax-highlighting"
+brew "fzf-tab"
+
+# --- Modern CLI replacements ----
+brew "fzf"
+brew "ripgrep"
+brew "bat"
+brew "eza"
+brew "zoxide"
+brew "fd"
+brew "jq"
+brew "jless"
+brew "tree"
+
+# --- Build/tools commonly needed by LazyVim and language tooling ----
+brew "git"
+brew "gh"
+brew "lazygit"
+brew "node"
+brew "luarocks"
+
+# --- Optional GUI apps (uncomment as desired) ----
+# cask "ghostty"
+# cask "alacritty"
+# cask "wezterm"
+# cask "font-jetbrains-mono-nerd-font"
+# cask "font-fira-code-nerd-font"

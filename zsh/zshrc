@@ -1,0 +1,256 @@
+# ~/.zshrc  (managed by dotfiles)
+# -----------------------------------------------------------
+# This file is a symlink to ~/.dotfiles/zsh/zshrc.
+# Edit the file in the dotfiles repo, then `source ~/.zshrc`.
+# -----------------------------------------------------------
+
+# Homebrew (macOS / Apple Silicon)
+if [[ -f "/opt/homebrew/bin/brew" ]]; then
+  eval "$(/opt/homebrew/bin/brew shellenv)"
+elif [[ -f "/usr/local/bin/brew" ]]; then
+  # Intel Macs
+  eval "$(/usr/local/bin/brew shellenv)"
+fi
+
+# Linuxbrew (Debian/Ubuntu, if installed)
+if [[ -f "/home/linuxbrew/.linuxbrew/bin/brew" ]]; then
+  eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+fi
+
+# -----------------------------------------------------------
+# History
+# -----------------------------------------------------------
+HISTSIZE=5000
+HISTFILE=~/.zsh_history
+SAVEHIST=$HISTSIZE
+HISTDUP=erase
+setopt appendhistory
+setopt sharehistory
+setopt hist_ignore_space
+setopt hist_ignore_all_dups
+setopt hist_save_no_dups
+setopt hist_ignore_dups
+setopt hist_find_no_dups
+
+# -----------------------------------------------------------
+# Keybindings
+# -----------------------------------------------------------
+bindkey -e
+bindkey '^p' history-search-backward
+bindkey '^n' history-search-forward
+
+# -----------------------------------------------------------
+# Completions  (must run before fzf-tab)
+# -----------------------------------------------------------
+autoload -Uz compinit && compinit
+
+# -----------------------------------------------------------
+# fzf + fzf-tab
+# -----------------------------------------------------------
+# Load fzf's shell integration BEFORE fzf-tab, otherwise fzf's
+# completion script can clobber the Tab widget that fzf-tab hooks into.
+if command -v fzf >/dev/null 2>&1; then
+  eval "$(fzf --zsh)"
+fi
+
+# fzf-tab requires `menu no` (not `menu select`) on current versions.
+zstyle ':completion:*' menu no
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
+zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
+
+# Source fzf-tab AFTER compinit and AFTER `eval "$(fzf --zsh)"`,
+# but BEFORE any plugin that wraps zle widgets (autosuggestions,
+# syntax-highlighting, etc.).
+for fzftab in \
+  "/opt/homebrew/opt/fzf-tab/share/fzf-tab/fzf-tab.plugin.zsh" \
+  "/opt/homebrew/opt/fzf-tab/share/fzf-tab/fzf-tab.zsh" \
+  "/usr/local/opt/fzf-tab/share/fzf-tab/fzf-tab.plugin.zsh" \
+  "/home/linuxbrew/.linuxbrew/share/fzf-tab/fzf-tab.plugin.zsh" \
+  "$HOME/.zsh/plugins/fzf-tab/fzf-tab.plugin.zsh"; do
+  if [[ -f "$fzftab" ]]; then
+    source "$fzftab"
+    break
+  fi
+done
+unset fzftab
+
+# Previews
+zstyle ':fzf-tab:complete:cd:*' fzf-preview 'ls -G $realpath 2>/dev/null || ls --color $realpath'
+zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'ls -G $realpath 2>/dev/null || ls --color $realpath'
+
+# -----------------------------------------------------------
+# zsh-autosuggestions  (fish-like ghost-text suggestions from history)
+# -----------------------------------------------------------
+for autosug in \
+  "/opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh" \
+  "/usr/local/share/zsh-autosuggestions/zsh-autosuggestions.zsh" \
+  "/home/linuxbrew/.linuxbrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh" \
+  "/usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh" \
+  "$HOME/.zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh"; do
+  if [[ -f "$autosug" ]]; then
+    source "$autosug"
+    break
+  fi
+done
+unset autosug
+
+ZSH_AUTOSUGGEST_STRATEGY=(history completion)
+# Ctrl+Space accepts the entire suggestion
+bindkey '^ ' autosuggest-accept
+
+# -----------------------------------------------------------
+# zsh-syntax-highlighting  (MUST be sourced LAST among plugins)
+# -----------------------------------------------------------
+for synhi in \
+  "/opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" \
+  "/usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" \
+  "/home/linuxbrew/.linuxbrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" \
+  "/usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" \
+  "$HOME/.zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"; do
+  if [[ -f "$synhi" ]]; then
+    source "$synhi"
+    break
+  fi
+done
+unset synhi
+
+# -----------------------------------------------------------
+# PATH / environment
+# -----------------------------------------------------------
+if [[ "$(uname -s)" == "Darwin" ]]; then
+  if /usr/libexec/java_home >/dev/null 2>&1; then
+    export JAVA_HOME="$(/usr/libexec/java_home)"
+  fi
+  export ANDROID_HOME="$HOME/Library/Android/sdk"
+  export PATH="$HOME/Library/Application Support/JetBrains/Toolbox/scripts:$PATH"
+  [[ -d "/opt/homebrew/opt/node@22/bin" ]] && export PATH="/opt/homebrew/opt/node@22/bin:$PATH"
+  [[ -n "${JAVA_HOME:-}" ]] && export PATH="$JAVA_HOME/bin:$PATH"
+  export PATH="$PATH:$ANDROID_HOME/tools:$ANDROID_HOME/tools/bin:$ANDROID_HOME/platform-tools"
+  [[ -d "/opt/homebrew/opt/openjdk@17/bin" ]] && export PATH="/opt/homebrew/opt/openjdk@17/bin:$PATH"
+fi
+
+# jenv (only when present)
+[[ -d "$HOME/.jenv/bin" ]] && export PATH="$HOME/.jenv/bin:$PATH"
+
+export EDITOR="nvim"
+export VISUAL="nvim"
+
+# -----------------------------------------------------------
+# Aliases
+# -----------------------------------------------------------
+if [[ "$(uname -s)" == "Darwin" ]]; then
+  alias ls="ls -Ga"
+else
+  alias ls="ls -a --color=auto"
+fi
+alias ..='cd ..'
+alias ...='cd ../..'
+alias q='exit'
+alias c='clear'
+alias vim='nvim'
+
+# Git
+alias log="git log --graph -30 --oneline"
+alias gs="git status"
+alias ciaclean='git branch --merged origin/master | grep -vE "^\s*(\*|main|develop|master)" | xargs -n 1 git branch -d'
+alias diffd="git diff develop...HEAD | diffnav"
+alias diffm="git diff master...HEAD | diffnav"
+
+# Scripts shipped with dotfiles
+alias scratch="$HOME/.dotfiles/scripts/scratch"
+alias rn="$HOME/.dotfiles/scripts/rn"
+alias httpstatus="$HOME/.dotfiles/scripts/httpstatus"
+
+# Work shortcuts
+alias workspace="cd $HOME/Developer/Projects/"
+alias cdai="cd $HOME/.ai/playground"
+
+# Suffix aliases: type the filename to open it
+alias -s json=jless
+alias -s md=bat
+alias -s txt=bat
+alias -s log=bat
+alias -s curl=bat
+alias -s html=open
+
+# Global aliases
+alias -g J='| jq'
+alias -g C='| pbcopy'
+
+# Utility
+alias path='echo -e ${PATH//:/\\n}'
+alias zshrc="$EDITOR ~/.zshrc"
+alias reload="source ~/.zshrc && echo 'Shell config reloaded from ~/.zshrc'"
+alias s="reload"
+alias get="curl -O -L"
+
+command_exists() {
+  command -v "$@" &> /dev/null
+}
+
+command_exists bat && alias cat="bat --style=plain"
+command_exists eza && {
+  alias ls="eza --icons --group-directories-first"
+  alias ll="eza -l --icons --group-directories-first"
+  alias la="eza -la --icons --group-directories-first"
+  alias lt="eza --tree --icons --level=2"
+}
+
+# -----------------------------------------------------------
+# Functions
+# -----------------------------------------------------------
+mkcd() {
+  \mkdir -p "$1"
+  cd "$1"
+}
+
+tempe() {
+  cd "$(mktemp -d)"
+  chmod -R 0700 .
+  if [[ $# -eq 1 ]]; then
+    \mkdir -p "$1"
+    cd "$1"
+    chmod -R 0700 .
+  fi
+}
+
+batdiff() {
+  git diff --name-only --relative --diff-filter=d -z | xargs -0 bat --diff
+}
+
+# -----------------------------------------------------------
+# Widgets
+# -----------------------------------------------------------
+# Edit current command in $EDITOR with Ctrl+X Ctrl+E
+autoload -Uz edit-command-line
+zle -N edit-command-line
+bindkey '^X^E' edit-command-line
+
+# Copy current command buffer to clipboard
+copy-buffer-to-clipboard() {
+  if command_exists pbcopy; then
+    echo -n "$BUFFER" | pbcopy
+  elif command_exists wl-copy; then
+    echo -n "$BUFFER" | wl-copy
+  elif command_exists xclip; then
+    echo -n "$BUFFER" | xclip -selection clipboard
+  fi
+  zle -M "Copied to clipboard"
+}
+zle -N copy-buffer-to-clipboard
+bindkey '^Xc' copy-buffer-to-clipboard
+
+# Insert git commit template (Ctrl+X g c)
+bindkey -s '^Xgc' 'git commit -m ""\C-b'
+
+# -----------------------------------------------------------
+# Local overrides (machine-specific; not tracked in dotfiles)
+# -----------------------------------------------------------
+[[ -f "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"
+
+# -----------------------------------------------------------
+# Shell integrations (AFTER fzf-tab and AFTER syntax-highlighting)
+# -----------------------------------------------------------
+command_exists starship && eval "$(starship init zsh)"
+command_exists zoxide   && eval "$(zoxide init --cmd cd zsh)"
+command_exists jenv     && eval "$(jenv init -)"

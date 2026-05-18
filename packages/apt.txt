@@ -1,0 +1,34 @@
+# Debian/Ubuntu apt packages.
+# One package per line. Blank lines and `#` comments are ignored.
+# install.sh installs these via `apt-get install -y`.
+
+# Core shell / multiplexer / editor
+zsh
+tmux
+# neovim from apt is usually too old for LazyVim; install.sh will use an
+# AppImage / PPA / build-from-source path instead. Leaving it out here.
+
+# Zsh plugins (Debian package names differ from Homebrew)
+zsh-autosuggestions
+zsh-syntax-highlighting
+
+# Modern CLI
+fzf
+ripgrep
+bat
+fd-find
+jq
+tree
+
+# Build/dev tooling needed for LazyVim treesitter parsers
+build-essential
+git
+curl
+unzip
+
+# Clipboard helpers (X11 + Wayland)
+xclip
+wl-clipboard
+
+# Locales
+locales

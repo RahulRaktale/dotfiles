@@ -1,0 +1,24 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+*.swp
+*.swo
+.vscode/
+.idea/
+
+# Local-only files inside the repo (if you ever drop one here by mistake)
+*.local
+zsh/zshrc.local
+git/gitconfig.local
+
+# Stale staging directory accidentally created in a parent
+_staging/
+
+# Neovim caches that should not be tracked
+nvim/.luarc.json
+
+# Test scratch
+scratch/
+tmp/

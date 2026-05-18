@@ -1,0 +1,39 @@
+# Global git ignore  (managed by dotfiles)
+# Symlinked to ~/.gitignore_global; applies to every repo on this machine.
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.Spotlight-V100
+.Trashes
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+
+# Editor / IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sublime-workspace
+*.sublime-project
+.nvim.lua
+.nvimrc
+.exrc
+
+# Logs and tmp
+*.log
+*.tmp
+*.bak
+*.cache
+
+# Env files (machine-specific secrets)
+.env
+.env.local
+.env.*.local
