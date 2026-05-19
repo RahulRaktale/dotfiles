@@ -250,6 +250,41 @@ else
 fi
 
 # =============================================================================
+# Step 1b: Catppuccin Macchiato — iTerm2 color preset
+# =============================================================================
+# Only runs on macOS and only if iTerm2 is installed. Imports the .itermcolors
+# file via `open`; iTerm2 then registers it as a Color Preset you can pick from
+# Preferences -> Profiles -> Colors -> Color Presets...
+install_iterm2_theme() {
+  [[ "$OS_FAMILY" == "macos" ]] || return 0
+
+  local iterm_app="/Applications/iTerm.app"
+  if [[ ! -d "$iterm_app" ]]; then
+    # Fallback: check mdfind in case iTerm is installed somewhere else
+    if ! command -v mdfind >/dev/null 2>&1 \
+       || [[ -z "$(mdfind 'kMDItemCFBundleIdentifier == com.googlecode.iterm2' 2>/dev/null | head -1)" ]]; then
+      log_skip "iTerm2 not installed; skipping Catppuccin Macchiato preset"
+      return 0
+    fi
+  fi
+
+  local theme="$DOTFILES_DIR/catppuccin/iterm2/Catppuccin-Macchiato.itermcolors"
+  if [[ ! -f "$theme" ]]; then
+    log_warn "iTerm2 theme file missing: $theme"
+    return 0
+  fi
+
+  log_info "Importing Catppuccin Macchiato into iTerm2..."
+  # `open` is idempotent — re-importing the same preset just overwrites itself.
+  run open -a iTerm "$theme"
+  log_ok "Catppuccin Macchiato imported. Enable it: iTerm2 -> Preferences -> Profiles -> Colors -> Color Presets... -> Catppuccin Macchiato"
+}
+
+if (( SKIP_PACKAGES == 0 )); then
+  install_iterm2_theme
+fi
+
+# =============================================================================
 # Step 2: symlink dotfiles
 # =============================================================================
 log_section "Linking dotfiles"

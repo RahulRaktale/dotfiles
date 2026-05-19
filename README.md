@@ -75,13 +75,14 @@ The installer is **idempotent** — safe to re-run. It will:
 
 ## What you get
 
-| Module     | What it sets up                                                                                                                         |
-| ---------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| `zsh`      | `~/.zshrc`, `~/.zprofile` with: history config, fzf + fzf-tab, **zsh-autosuggestions**, **zsh-syntax-highlighting**, aliases, widgets   |
-| `tmux`     | `~/.tmux.conf` + `~/.tmux/tmux-keybindings.conf`, TPM auto-bootstrap, prefix remapped to `C-a`, vim-like copy-mode, mouse, 50k history  |
-| `nvim`     | `~/.config/nvim` symlinked to a **LazyVim** install with sensible options, custom keymaps and autocmds, tokyonight colorscheme          |
-| `starship` | `~/.config/starship.toml` — two-line prompt with git status, language indicators, nerd-font glyphs                                      |
-| `git`      | `~/.gitconfig` + `~/.gitignore_global` — sane defaults, useful aliases, `.gitconfig.local` for machine-specific overrides               |
+| Module       | What it sets up                                                                                                                         |
+| ------------ | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `zsh`        | `~/.zshrc`, `~/.zprofile` with: history config, fzf + fzf-tab, **zsh-autosuggestions**, **zsh-syntax-highlighting**, aliases, widgets   |
+| `tmux`       | `~/.tmux.conf` + `~/.tmux/tmux-keybindings.conf`, TPM auto-bootstrap, prefix remapped to `C-a`, vim-like copy-mode, mouse, 50k history  |
+| `nvim`       | `~/.config/nvim` symlinked to a **LazyVim** install with sensible options, custom keymaps and autocmds                                  |
+| `starship`   | `~/.config/starship.toml` — two-line prompt with git status, language indicators, nerd-font glyphs                                      |
+| `git`        | `~/.gitconfig` + `~/.gitignore_global` — sane defaults, useful aliases, `.gitconfig.local` for machine-specific overrides               |
+| `catppuccin` | **Catppuccin Macchiato** theme files for iTerm2, Ghostty, Alacritty + plugin/palette config baked into tmux, starship, nvim, fzf        |
 
 ## Documentation
 
