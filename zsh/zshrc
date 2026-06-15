@@ -52,13 +52,17 @@ export FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS \
 --color=bg+:#363a4f,bg:#24273a,spinner:#f4dbd6,hl:#ed8796 \
 --color=fg:#cad3f4,header:#ed8796,info:#c6a0f6,pointer:#f4dbd6 \
 --color=marker:#b7bdf8,fg+:#cad3f4,prompt:#c6a0f6,hl+:#ed8796 \
---color=selected-bg:#494d64 \
 --multi"
 
 # Load fzf's shell integration BEFORE fzf-tab, otherwise fzf's
 # completion script can clobber the Tab widget that fzf-tab hooks into.
 if command -v fzf >/dev/null 2>&1; then
-  eval "$(fzf --zsh)"
+  if [[ -r /usr/share/doc/fzf/examples/key-bindings.zsh ]]; then
+    source /usr/share/doc/fzf/examples/key-bindings.zsh
+    [[ -r /usr/share/doc/fzf/examples/completion.zsh ]] && source /usr/share/doc/fzf/examples/completion.zsh
+  elif fzf --zsh >/dev/null 2>&1; then
+    eval "$(fzf --zsh)"
+  fi
 fi
 
 # fzf-tab requires `menu no` (not `menu select`) on current versions.

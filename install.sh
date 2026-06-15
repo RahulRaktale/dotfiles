@@ -3,7 +3,8 @@
 #
 # What it does (in order):
 #   1. Detect the OS family (macOS / Debian-Ubuntu).
-#   2. Install a package manager (Homebrew on both macOS and Debian, or apt).
+#   2. Install packages with Homebrew on macOS, apt on Debian/Ubuntu, and
+#      Linuxbrew on Debian/Ubuntu when it is already available.
 #   3. Install all packages (zsh, tmux, neovim, starship, fzf, ripgrep, bat,
 #      eza, zoxide, zsh-autosuggestions, zsh-syntax-highlighting, fzf-tab, ...).
 #   4. Back up any conflicting files in $HOME to ~/.dotfiles-backup/<timestamp>/
@@ -141,6 +142,8 @@ install_packages_debian() {
   local sudo
   sudo="$(sudo_cmd)"
 
+  use_linuxbrew_if_available
+
   run $sudo apt-get update
 
   # Read packages from apt.txt (skip blank lines and comments)
@@ -172,6 +175,13 @@ install_packages_debian() {
   install_fzf_tab_debian
 }
 
+use_linuxbrew_if_available() {
+  if [[ -x "/home/linuxbrew/.linuxbrew/bin/brew" ]]; then
+    eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+    log_info "Linuxbrew detected; using it for packages that need newer upstream builds."
+  fi
+}
+
 install_neovim_debian() {
   local need_install=1
   if command -v nvim >/dev/null 2>&1; then
@@ -186,11 +196,16 @@ install_neovim_debian() {
     fi
   fi
   if (( need_install )); then
-    log_info "Installing latest Neovim AppImage..."
-    run mkdir -p "$HOME/.local/bin"
-    run curl -L -o "$HOME/.local/bin/nvim" \
-      "https://github.com/neovim/neovim/releases/latest/download/nvim.appimage"
-    run chmod +x "$HOME/.local/bin/nvim"
+    if command -v brew >/dev/null 2>&1; then
+      log_info "Installing Neovim with Linuxbrew..."
+      run brew install neovim
+    else
+      log_info "Installing latest Neovim AppImage..."
+      run mkdir -p "$HOME/.local/bin"
+      run curl -L -o "$HOME/.local/bin/nvim" \
+        "https://github.com/neovim/neovim/releases/latest/download/nvim.appimage"
+      run chmod +x "$HOME/.local/bin/nvim"
+    fi
   else
     log_skip "nvim already >= 0.10"
   fi
@@ -200,8 +215,13 @@ install_starship_debian() {
   if command -v starship >/dev/null 2>&1; then
     log_skip "starship already installed"
   else
-    log_info "Installing starship..."
-    run sh -c "$(curl -fsSL https://starship.rs/install.sh)" -- --yes --bin-dir "$HOME/.local/bin"
+    if command -v brew >/dev/null 2>&1; then
+      log_info "Installing starship with Linuxbrew..."
+      run brew install starship
+    else
+      log_info "Installing starship..."
+      run sh -c 'curl -fsSL https://starship.rs/install.sh | sh -s -- --yes --bin-dir "$HOME/.local/bin"'
+    fi
   fi
 }
 
@@ -227,7 +247,7 @@ install_zoxide_debian() {
     return
   fi
   log_info "Installing zoxide..."
-  run sh -c "$(curl -fsSL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh)"
+  run sh -c 'curl -fsSL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh'
 }
 
 install_fzf_tab_debian() {
@@ -312,6 +332,11 @@ fi
 if is_enabled starship; then
   run mkdir -p "$HOME/.config"
   link_file "$DOTFILES_DIR/starship/starship.toml" "$HOME/.config/starship.toml"
+  if [[ "$DRY_RUN" != "1" ]] && command -v starship >/dev/null 2>&1; then
+    log_info "Validating Starship config..."
+    starship print-config >/dev/null
+    log_ok "starship config is valid"
+  fi
 fi
 
 # git

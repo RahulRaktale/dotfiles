@@ -9,6 +9,9 @@ format = """
 
 add_newline = true
 
+# Catppuccin Macchiato palette
+palette = "catppuccin_macchiato"
+
 [character]
 success_symbol = "[➜](bold green)"
 error_symbol = "[✗](bold red)"
@@ -81,9 +84,6 @@ format = "took [$duration](bold yellow) "
 
 [time]
 disabled = true
-
-# Catppuccin Macchiato palette
-palette = "catppuccin_macchiato"
 
 [palettes.catppuccin_macchiato]
 rosewater = "#f4dbd6"
